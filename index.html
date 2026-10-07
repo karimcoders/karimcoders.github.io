@@ -876,5 +876,25 @@ document.getElementById('frm').addEventListener('submit', function(e){
 document.getElementById('yr').textContent = new Date().getFullYear();
 applyLang(lang);
 </script>
+
+<script>
+/* ===== UPDATE CHECK (purani cache ko auto-refresh karne ke liye) ===== */
+var SITE_VER="2026-10-06.2";
+(function(){
+  try{
+    var last = +(sessionStorage.getItem('sn_chk')||0);
+    if (Date.now()-last < 60000) return;
+    sessionStorage.setItem('sn_chk', Date.now());
+    fetch(location.pathname + '?cb=' + Date.now(), {cache:'no-store'})
+      .then(function(r){ return r.text(); })
+      .then(function(t){
+        var m = t.match(/SITE_VER="([^"]+)"/);
+        if (m && m[1] !== SITE_VER && !location.search) {
+          location.replace(location.pathname + '?v=' + Date.now());
+        }
+      }).catch(function(){});
+  }catch(e){}
+})();
+</script>
 </body>
 </html>
